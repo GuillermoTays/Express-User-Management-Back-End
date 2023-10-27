@@ -1,13 +1,13 @@
-import express from 'express';
-import { readdirSync, statSync } from 'fs';
-import { join, resolve } from 'path';
-import { attachSequelize } from './middleware/db';
-import Cors from './middleware/cors'
-import IRoute from './types/IRoute';
+import express from "express";
+import { readdirSync, statSync } from "fs";
+import { join, resolve } from "path";
+import { attachSequelize } from "./middleware/db";
+import Cors from "./middleware/cors";
+import IRoute from "./types/IRoute";
 
 const appCfg = {
   port: parseInt(process.env.EXPRESS_PORT) || 50000,
-  hostname: process.env.EXPRESS_HOST ?? '127.0.0.1',
+  hostname: process.env.EXPRESS_HOST ?? "127.0.0.1",
 };
 
 const app = express();
@@ -17,13 +17,13 @@ app.use(Cors);
 app.use(attachSequelize);
 
 // Read all entries from the "routes" directory. Filter out any entry that is not a file.
-const _ROUTES_ROOT = resolve(join(__dirname, './routes/'));
+const _ROUTES_ROOT = resolve(join(__dirname, "./routes/"));
 const queue = readdirSync(_ROUTES_ROOT)
-  .map(entry => join(_ROUTES_ROOT, entry))
+  .map((entry) => join(_ROUTES_ROOT, entry))
   .filter(isFile);
 
 // For each item in the queue, inject it as an API route.
-queue.forEach(entry => {
+queue.forEach((entry) => {
   try {
     const required = require(entry);
     if (required?.default) {
