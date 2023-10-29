@@ -19,6 +19,10 @@ const UsersRouter: IRoute = {
         const offset: number = Number(req.query.offset);
         const limit: number = Number(req.query.limit);
         const filter: string = String(req.query.filter);
+        const sort_key: string = String(req.query.sort_key);
+        const sort_direction: string = String(req.query.sort_direction);
+
+        console.log(sort_key, sort_direction);
 
         console.log(filter);
 
@@ -30,6 +34,9 @@ const UsersRouter: IRoute = {
               },
             })),
           },
+          order: [
+            [`${sort_key}`, sort_direction === "descending" ? "DESC" : "ASC"],
+          ],
           offset: offset,
           limit: limit,
         })
@@ -41,13 +48,13 @@ const UsersRouter: IRoute = {
                 offset + limit < count
                   ? `http://127.0.0.1:50000/users?offset=${
                       offset + limit
-                    }&limit=${limit}&filter=${filter}`
+                    }&limit=${limit}&filter=${filter}&sort_key=${sort_key}&sort_direction=${sort_direction}`
                   : null,
               previous:
                 offset - limit >= 0
                   ? `http://127.0.0.1:50000/users?offset=${
                       offset - limit
-                    }&limit=${limit}&filter=${filter}`
+                    }&limit=${limit}&filter=${filter}&sort_key=${sort_key}&sort_direction=${sort_direction}`
                   : null,
               results: rows,
             });
