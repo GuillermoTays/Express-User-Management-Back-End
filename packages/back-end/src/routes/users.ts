@@ -1,6 +1,7 @@
 import { Router } from "express";
 import IRoute from "../types/IRoute";
 import { User } from "../services/db";
+import { Op } from "sequelize";
 const url = require("url");
 
 const UsersRouter: IRoute = {
@@ -15,12 +16,20 @@ const UsersRouter: IRoute = {
         // pro tip: if you're not seeing any users, make sure you seeded the database.
         //          make sure you read the readme! :)
 
-        console.log(req.url);
-
         const offset: number = Number(req.query.offset);
         const limit: number = Number(req.query.limit);
+        const filter: string = String(req.query.filter);
+
+        console.log(filter);
 
         await User.findAndCountAll({
+          where: {
+            [Op.or]: Object.keys(User.rawAttributes).map((columnName) => ({
+              [columnName]: {
+                [Op.like]: `%${filter}%`,
+              },
+            })),
+          },
           offset: offset,
           limit: limit,
         })
@@ -32,13 +41,13 @@ const UsersRouter: IRoute = {
                 offset + limit < count
                   ? `http://127.0.0.1:50000/users?offset=${
                       offset + limit
-                    }&limit=${limit}`
+                    }&limit=${limit}&filter=${filter}`
                   : null,
               previous:
                 offset - limit >= 0
                   ? `http://127.0.0.1:50000/users?offset=${
                       offset - limit
-                    }&limit=${limit}`
+                    }&limit=${limit}&filter=${filter}`
                   : null,
               results: rows,
             });
@@ -49,20 +58,6 @@ const UsersRouter: IRoute = {
               success: false,
             });
           });
-
-        // return User.findAll()
-        //   .then((users) => {
-        //     return res.json({
-        //       success: true,
-        //       data: users,
-        //     });
-        //   })
-        //   .catch((err) => {
-        //     console.error("Failed to list all users.", err);
-        //     res.status(500).json({
-        //       success: false,
-        //     });
-        //   });
       });
 
     return router;
