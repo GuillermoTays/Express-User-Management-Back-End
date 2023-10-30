@@ -28,11 +28,23 @@ const UsersRouter: IRoute = {
 
         await User.findAndCountAll({
           where: {
-            [Op.or]: Object.keys(User.rawAttributes).map((columnName) => ({
-              [columnName]: {
-                [Op.like]: `%${filter}%`,
+            [Op.or]: [
+              {
+                $firstName$: {
+                  [Op.like]: `%${filter}%`,
+                },
               },
-            })),
+              {
+                $lastName$: {
+                  [Op.like]: `%${filter}%`,
+                },
+              },
+              {
+                $email$: {
+                  [Op.like]: `%${filter}%`,
+                },
+              },
+            ],
           },
           order: [
             [`${sort_key}`, sort_direction === "descending" ? "DESC" : "ASC"],
