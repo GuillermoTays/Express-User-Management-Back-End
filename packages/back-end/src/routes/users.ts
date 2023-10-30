@@ -1,7 +1,7 @@
 import { Router } from "express";
 import IRoute from "../types/IRoute";
 import { User } from "../services/db";
-import { Op } from "sequelize";
+import { Op, where } from "sequelize";
 const url = require("url");
 
 const UsersRouter: IRoute = {
@@ -66,6 +66,68 @@ const UsersRouter: IRoute = {
             });
           });
       });
+
+    router.route("/add").post(async (req, res) => {
+      let data = req.body;
+      await User.findOrCreate({
+        where: {
+          $id$: data.id,
+        },
+        defaults: {
+          ...data,
+        },
+      })
+        .then(([user, created]) => {
+          res.json({ user, created });
+        })
+        .catch((err) => {
+          console.error("Failed to create a user", err);
+          res.status(500).json({
+            success: false,
+          });
+        });
+    });
+
+    router.route("/edit").post(async (req, res) => {
+      let data = req.body;
+      await User.update(
+        {
+          ...data,
+        },
+        {
+          where: {
+            $id$: data.id,
+          },
+        }
+      )
+        .then((affectedCount) => {
+          res.json(`${affectedCount} has changed`);
+        })
+        .catch((err) => {
+          console.error("Failed to update a user", err);
+          res.status(500).json({
+            success: false,
+          });
+        });
+    });
+
+    router.route("/delete").post(async (req, res) => {
+      let data = req.body;
+      await User.destroy({
+        where: {
+          $id$: data.id,
+        },
+      })
+        .then((count) => {
+          res.json(`${count} deleted`);
+        })
+        .catch((err) => {
+          console.error("Failed to delete a user", err);
+          res.status(500).json({
+            success: false,
+          });
+        });
+    });
 
     return router;
   },

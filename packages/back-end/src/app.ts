@@ -4,6 +4,7 @@ import { join, resolve } from "path";
 import { attachSequelize } from "./middleware/db";
 import Cors from "./middleware/cors";
 import IRoute from "./types/IRoute";
+import bodyParser from "body-parser";
 
 const appCfg = {
   port: parseInt(process.env.EXPRESS_PORT) || 50000,
@@ -15,6 +16,9 @@ const app = express();
 // Attach any middleware
 app.use(Cors);
 app.use(attachSequelize);
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: false }));
+// app.use(express.json());
 
 // Read all entries from the "routes" directory. Filter out any entry that is not a file.
 const _ROUTES_ROOT = resolve(join(__dirname, "./routes/"));

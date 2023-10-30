@@ -18,6 +18,7 @@
     "nodemon": "^2.0.20"
   },
   "dependencies": {
+    "body-parser": "^1.20.2",
     "ts-node": "^10.9.1"
   }
 }
